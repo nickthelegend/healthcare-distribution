@@ -43,15 +43,16 @@ const peraWallet = new PeraWalletConnect()
 export default function Home() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = React.useState(false)
-  const [accountAddress, setAccountAddress] = React.useState(null)
-  const [balance, setBalance] = React.useState(null)
+  const [accountAddress, setAccountAddress] = React.useState<string | null>(null)
+  const [balance, setBalance] = React.useState<number | null>(null)
   const isConnectedToPeraWallet = !!accountAddress
 
   React.useEffect(() => {
     peraWallet
       .reconnectSession()
       .then((accounts) => {
-        peraWallet.connector.on("disconnect", handleDisconnectWalletClick)
+        peraWallet.connector?.on("disconnect", handleDisconnectWalletClick)
+
 
         if (accounts.length) {
           setAccountAddress(accounts[0])
@@ -61,7 +62,7 @@ export default function Home() {
       .catch((e) => console.log(e))
   }, [])
 
-  const fetchAccountBalance = async (address) => {
+  const fetchAccountBalance = async (address: string) => {
     try {
       const accountInfo = await algodClient.accountInformation(address).do()
       const accountBalance = algosdk.microalgosToAlgos(accountInfo.amount)
@@ -75,7 +76,7 @@ export default function Home() {
     peraWallet
       .connect()
       .then((newAccounts) => {
-        peraWallet.connector.on("disconnect", handleDisconnectWalletClick)
+        peraWallet.connector?.on("disconnect", handleDisconnectWalletClick)
         setAccountAddress(newAccounts[0])
         fetchAccountBalance(newAccounts[0])
       })
@@ -94,7 +95,7 @@ export default function Home() {
     }
   }
 
-  const truncateText = (text, maxLength) => {
+  const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
       return text.substring(0, maxLength) + '...'
     }
