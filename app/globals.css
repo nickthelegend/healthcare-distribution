@@ -71,3 +71,17 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+
+@keyframes pulse-faster {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-faster 3s linear infinite;
+}

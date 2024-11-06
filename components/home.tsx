@@ -16,20 +16,90 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-import { WalletIcon, MenuIcon } from "lucide-react"
+import { WalletIcon, MenuIcon, Settings, User } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { PeraWalletConnect } from "@perawallet/connect"
+import algosdk from "algosdk"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
 
 const navigationItems = [
-  { href: '/', label: 'Home' },
+  // { href: '/', label: 'Home' },
   { href: '/vaccine-stock', label: 'Vaccine Stock' },
   { href: '/administer-vaccine', label: 'Administer Vaccine' },
   { href: '/request-vaccine', label: 'Request Vaccine' },
   { href: '/add-vaccine', label: 'Add Vaccine' },
 ]
 
+const algodClient = new algosdk.Algodv2("", "https://testnet-api.algonode.cloud", "")
+const peraWallet = new PeraWalletConnect()
+
 export default function Home() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = React.useState(false)
+  const [accountAddress, setAccountAddress] = React.useState(null)
+  const [balance, setBalance] = React.useState(null)
+  const isConnectedToPeraWallet = !!accountAddress
+
+  React.useEffect(() => {
+    peraWallet
+      .reconnectSession()
+      .then((accounts) => {
+        peraWallet.connector.on("disconnect", handleDisconnectWalletClick)
+
+        if (accounts.length) {
+          setAccountAddress(accounts[0])
+          fetchAccountBalance(accounts[0])
+        }
+      })
+      .catch((e) => console.log(e))
+  }, [])
+
+  const fetchAccountBalance = async (address) => {
+    try {
+      const accountInfo = await algodClient.accountInformation(address).do()
+      const accountBalance = algosdk.microalgosToAlgos(accountInfo.amount)
+      setBalance(accountBalance)
+    } catch (error) {
+      console.log("Failed to fetch account balance", error)
+    }
+  }
+
+  const handleConnectWalletClick = () => {
+    peraWallet
+      .connect()
+      .then((newAccounts) => {
+        peraWallet.connector.on("disconnect", handleDisconnectWalletClick)
+        setAccountAddress(newAccounts[0])
+        fetchAccountBalance(newAccounts[0])
+      })
+      .catch((error) => {
+        if (error?.data?.type !== "CONNECT_MODAL_CLOSED") {
+          console.log(error)
+        }
+      })
+  }
+
+  const handleDisconnectWalletClick = () => {
+    if (isConnectedToPeraWallet) {
+      peraWallet.disconnect()
+      setAccountAddress(null)
+      setBalance(null)
+    }
+  }
+
+  const truncateText = (text, maxLength) => {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + '...'
+    }
+    return text
+  }
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
@@ -65,9 +135,39 @@ export default function Home() {
         </div>
 
         <div className="flex items-center">
-          <Button variant="ghost" className="text-white border-white hover:bg-white hover:text-black mr-4 md:mr-0">
-            <WalletIcon className="mr-2 h-4 w-4" /> Connect Wallet
-          </Button>
+          {isConnectedToPeraWallet ? (
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" className="text-white">
+                <Settings className="w-6 h-6" />
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="text-white">
+                    <User className="w-6 h-6" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>
+                    <p className="truncate overflow-hidden whitespace-nowrap">
+                      {truncateText(accountAddress, 12)}
+                    </p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem>Support</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleDisconnectWalletClick} className="text-red-500">
+                    Disconnect
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            <Button onClick={handleConnectWalletClick} variant="ghost" className="text-white border-white hover:bg-white hover:text-black">
+              <WalletIcon className="mr-2 h-4 w-4" /> Connect Wallet
+            </Button>
+          )}
           
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
@@ -107,9 +207,15 @@ export default function Home() {
                   ))}
                 </nav>
                 <div className="border-t border-gray-800 pt-4 pb-6">
-                  <Button className="w-full justify-start text-left" variant="ghost">
-                    <WalletIcon className="mr-2 h-4 w-4" /> Connect Wallet
-                  </Button>
+                  {isConnectedToPeraWallet ? (
+                    <Button className="w-full justify-start text-left" variant="destructive" onClick={handleDisconnectWalletClick}>
+                      <WalletIcon className="mr-2 h-4 w-4" /> Disconnect Wallet
+                    </Button>
+                  ) : (
+                    <Button className="w-full justify-start text-left" variant="ghost" onClick={handleConnectWalletClick}>
+                      <WalletIcon className="mr-2 h-4 w-4" /> Connect Wallet
+                    </Button>
+                  )}
                 </div>
               </div>
             </SheetContent>
