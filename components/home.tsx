@@ -1,3 +1,4 @@
+
 'use client'
 
 import * as React from 'react'
@@ -16,7 +17,7 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-import { WalletIcon, MenuIcon, Settings, User } from "lucide-react"
+import { WalletIcon, MenuIcon, Settings, User } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { PeraWalletConnect } from "@perawallet/connect"
 import algosdk from "algosdk"
@@ -28,9 +29,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
+import { motion } from "framer-motion"
 
 const navigationItems = [
-  // { href: '/', label: 'Home' },
   { href: '/vaccine-stock', label: 'Vaccine Stock' },
   { href: '/administer-vaccine', label: 'Administer Vaccine' },
   { href: '/request-vaccine', label: 'Request Vaccine' },
@@ -52,7 +53,6 @@ export default function Home() {
       .reconnectSession()
       .then((accounts) => {
         peraWallet.connector?.on("disconnect", handleDisconnectWalletClick)
-
 
         if (accounts.length) {
           setAccountAddress(accounts[0])
@@ -224,14 +224,119 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-80px)] text-center p-8">
-        <h1 className="text-4xl md:text-6xl font-bold mb-6">Welcome to äkta Vaccination Clinic</h1>
-        <p className="text-xl md:text-2xl max-w-2xl mb-8">
-          Our decentralized platform ensures secure and efficient vaccine administration. Connect your wallet to get started.
-        </p>
-        <Button size="lg" className="text-black bg-white hover:bg-gray-200">
-          Learn More
-        </Button>
+      <main className="relative z-10">
+        <section className="flex flex-col items-center justify-center min-h-screen text-center p-8">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-4xl md:text-6xl font-bold mb-6"
+          >
+            Welcome to äkta Vaccination Clinic
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-xl md:text-2xl max-w-2xl mb-8"
+          >
+            Our decentralized platform ensures secure and efficient vaccine administration. Connect your wallet to get started.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            <Button size="lg" className="text-black bg-white hover:bg-gray-200">
+              Learn More
+            </Button>
+          </motion.div>
+        </section>
+
+        <motion.section 
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="min-h-screen flex flex-col items-center justify-center p-8"
+        >
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">Our Services</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {navigationItems.map((item, index) => (
+              <motion.div
+                key={item.href}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-gray-800 p-6 rounded-lg"
+              >
+                <h3 className="text-xl font-semibold mb-2">{item.label}</h3>
+                <p className="text-gray-300">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                <Link href={item.href}>
+                  <Button variant="link" className="mt-4">Learn More</Button>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
+        <motion.section 
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="min-h-screen flex flex-col items-center justify-center p-8"
+        >
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">About Us</h2>
+          <p className="text-xl max-w-3xl text-center mb-8">
+            äkta Vaccination Clinic is committed to providing secure and efficient vaccine administration through our decentralized platform. We leverage blockchain technology to ensure transparency and reliability in vaccine distribution.
+          </p>
+          <Button variant="outline">Read Our Story</Button>
+        </motion.section>
+
+        <footer className="bg-gray-900 text-white py-8">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div>
+                <h3 className="text-lg font-semibold mb-4">äkta Vaccination Clinic</h3>
+                <p className="text-sm text-gray-400">Secure and efficient vaccine administration on the blockchain.</p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+                <ul className="space-y-2">
+                  {navigationItems.map((item) => (
+                    <li key={item.href}>
+                      <Link href={item.href} className="text-sm text-gray-400 hover:text-white">
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+                <p className="text-sm text-gray-400">Email: info@aktavaccine.com</p>
+                <p className="text-sm text-gray-400">Phone: +1 (555) 123-4567</p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Legal</h3>
+                <ul className="space-y-2">
+                  <li>
+                    <Link href="/privacy-policy" className="text-sm text-gray-400 hover:text-white">
+                      Privacy Policy
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/terms-of-service" className="text-sm text-gray-400 hover:text-white">
+                      Terms of Service
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-8 pt-8 border-t border-gray-800 text-center">
+              <p className="text-sm text-gray-400">&copy; 2023 äkta Vaccination Clinic. All rights reserved.</p>
+            </div>
+          </div>
+        </footer>
       </main>
     </div>
   )
