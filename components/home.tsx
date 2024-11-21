@@ -1,4 +1,3 @@
-
 'use client'
 
 import * as React from 'react'
@@ -47,6 +46,8 @@ export default function Home() {
   const [accountAddress, setAccountAddress] = React.useState<string | null>(null)
   const [balance, setBalance] = React.useState<number | null>(null)
   const isConnectedToPeraWallet = !!accountAddress
+
+  const servicesRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
     peraWallet
@@ -102,6 +103,10 @@ export default function Home() {
     return text
   }
 
+  const handleLearnMoreClick = () => {
+    servicesRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
       <div className="absolute inset-0 z-0">
@@ -112,7 +117,7 @@ export default function Home() {
         </div>
       </div>
 
-      <header className="relative z-10 flex justify-between items-center p-4">
+      <header className="relative z-10 flex justify-between items-center p-4 bg-gray-900 border-b border-gray-800">
         <div className="flex items-center">
           <Link href="/" className="text-2xl font-bold">
             äkta
@@ -247,13 +252,14 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <Button size="lg" className="text-black bg-white hover:bg-gray-200">
+            <Button size="lg" className="text-black bg-white hover:bg-gray-200" onClick={handleLearnMoreClick}>
               Learn More
             </Button>
           </motion.div>
         </section>
 
         <motion.section 
+          ref={servicesRef}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
