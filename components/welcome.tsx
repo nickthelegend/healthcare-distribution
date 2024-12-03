@@ -24,9 +24,17 @@ const socialLinks = [
   { label: 'LinkedIn', href: 'https://linkedin.com/company/akta', icon: Linkedin },
 ]
 const partnerLogos = [
-  { name: "Partner 1", url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/%7B52FA3B43-1F2F-48D2-8FC8-CB09A8FEE654%7D-gmBcqD3WqTymxi5GxfHvGeBe3ZQRfq.png" },
-  { name: "Partner 2", url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/%7B52FA3B43-1F2F-48D2-8FC8-CB09A8FEE654%7D-gmBcqD3WqTymxi5GxfHvGeBe3ZQRfq.png" },
-  { name: "Partner 3", url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/%7B52FA3B43-1F2F-48D2-8FC8-CB09A8FEE654%7D-gmBcqD3WqTymxi5GxfHvGeBe3ZQRfq.png" },
+  { name: "Gavi", url: "https://www.gavi.org/sites/default/files/Gavi-logo_1b.png" },
+
+  { name: "Bill & Melinda Gates Foundation", url: "https://www.ntd-ngonetwork.org/sites/nnn/files/styles/grid-6-wide-logo/public/content/organisation/logos/2023-08-04/Bill_%26_Melinda_Gates_Foundation_white%20bkgr.png?itok=CXTNJC5i&timestamp=1691122251" },
+  { name: "Algorand", url: "https://mma.prnewswire.com/media/1229493/Algorand_Inc_Logo.jpg?p=publish" },
+  { name: "National Health Mission (NHM)", url: "https://chfw.telangana.gov.in/images_new/nhm.png" },
+  { name: "DHL", url: "https://content3.jdmagicbox.com/v2/comp/hyderabad/i3/040pxx40.xx40.120321155404.y3i3/catalogue/dhl-express-india-pvt-ltd-gachibowli-hyderabad-international-courier-services-for-corporate-g69zuomoxr.jpg" },
+  { name: "Fedex", url: "https://assets.turbologo.com/blog/en/2019/12/19084817/Fedex-logo.png" },
+  { name: "Blue Dart", url: "https://upload.wikimedia.org/wikipedia/commons/2/2d/Blue_Dart_logo_transparent.png" },
+  { name: "Doctor Reddy's Laboratory", url: "https://www.cphi-online.com/DrR_Logo_Secondary_RGB-comp280807.jpg" },
+  { name: "Max HealthCare", url: "https://media.assettype.com/freepressjournal/2021-12/b41a04f9-e1d6-4188-806f-1fae37de7cf2/640px_Max_Healthcare_Logo.png" },
+
 ]
 
 export default function Component() {
