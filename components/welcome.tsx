@@ -2,162 +2,59 @@
 
 import * as React from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { motion, useScroll, useTransform } from "framer-motion"
+import { ArrowRight } from 'lucide-react'
 import { Button } from "@/components/ui/button"
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion"
-import { WalletIcon, User, ArrowRight, Twitter, Instagram, Linkedin } from 'lucide-react'
 import { cn } from "@/lib/utils"
-import { PeraWalletConnect } from "@perawallet/connect"
-import algosdk from "algosdk"
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu"
+import Image from 'next/image'
+import { WalletIcon, User, Twitter, Instagram, Linkedin } from 'lucide-react'
 
 const navigationItems = [
-  { href: '/about', label: 'About' },
-  { href: '/work', label: 'Work' },
+  { href: '/docs', label: 'Docs' },
+  { href: '/security', label: 'Security' },
   { href: '/blog', label: 'Blog' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/pricing', label: 'Pricing' },
 ]
+
+
 
 const socialLinks = [
   { label: 'Twitter', href: 'https://twitter.com/akta', icon: Twitter },
   { label: 'Instagram', href: 'https://instagram.com/akta', icon: Instagram },
   { label: 'LinkedIn', href: 'https://linkedin.com/company/akta', icon: Linkedin },
 ]
-
 const partnerLogos = [
   { name: "Partner 1", url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/%7B52FA3B43-1F2F-48D2-8FC8-CB09A8FEE654%7D-gmBcqD3WqTymxi5GxfHvGeBe3ZQRfq.png" },
   { name: "Partner 2", url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/%7B52FA3B43-1F2F-48D2-8FC8-CB09A8FEE654%7D-gmBcqD3WqTymxi5GxfHvGeBe3ZQRfq.png" },
   { name: "Partner 3", url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/%7B52FA3B43-1F2F-48D2-8FC8-CB09A8FEE654%7D-gmBcqD3WqTymxi5GxfHvGeBe3ZQRfq.png" },
 ]
 
-const algodClient = new algosdk.Algodv2("", "https://testnet-api.algonode.cloud", "")
-const peraWallet = new PeraWalletConnect()
-
-export default function Home() {
-  const pathname = usePathname()
-  const [accountAddress, setAccountAddress] = React.useState<string | null>(null)
-  const [balance, setBalance] = React.useState<number | null>(null)
-  const isConnectedToPeraWallet = !!accountAddress
-  const [lastScrollY, setLastScrollY] = React.useState(0)
-  const [shouldShowNav, setShouldShowNav] = React.useState(true)
-
+export default function Component() {
   const { scrollY } = useScroll()
+  const [activeSection, setActiveSection] = React.useState(0)
+  
   const headerBg = useTransform(
     scrollY,
     [0, 100],
-    ["rgba(248, 241, 236, 0)", "rgba(248, 241, 236, 1)"]
+    ["rgba(0, 82, 78, 0)", "rgba(0, 82, 78, 1)"]
   )
+  
   const headerColor = useTransform(
     scrollY,
     [0, 100],
-    ["rgb(255, 255, 255)", "rgb(0, 82, 78)"]
+    ["rgb(0, 82, 78)", "rgb(255, 255, 255)"]
   )
 
-  React.useEffect(() => {
-    const controlNavbar = () => {
-      const currentScrollY = window.scrollY
-      
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        setShouldShowNav(false)
-      } else {
-        setShouldShowNav(true)
-      }
-      
-      setLastScrollY(currentScrollY)
-    }
-
-    window.addEventListener('scroll', controlNavbar)
-    return () => window.removeEventListener('scroll', controlNavbar)
-  }, [lastScrollY])
-
-  React.useEffect(() => {
-    peraWallet
-      .reconnectSession()
-      .then((accounts) => {
-        peraWallet.connector?.on("disconnect", handleDisconnectWalletClick)
-        if (accounts.length) {
-          setAccountAddress(accounts[0])
-          fetchAccountBalance(accounts[0])
-        }
-      })
-      .catch((e) => console.log(e))
-  }, [])
-
-  const fetchAccountBalance = async (address: string) => {
-    try {
-      const accountInfo = await algodClient.accountInformation(address).do()
-      const accountBalance = algosdk.microalgosToAlgos(accountInfo.amount)
-      setBalance(accountBalance)
-    } catch (error) {
-      console.log("Failed to fetch account balance", error)
-    }
-  }
-
-  const handleConnectWalletClick = () => {
-    peraWallet
-      .connect()
-      .then((newAccounts) => {
-        peraWallet.connector?.on("disconnect", handleDisconnectWalletClick)
-        setAccountAddress(newAccounts[0])
-        fetchAccountBalance(newAccounts[0])
-      })
-      .catch((error) => {
-        if (error?.data?.type !== "CONNECT_MODAL_CLOSED") {
-          console.log(error)
-        }
-      })
-  }
-
-  const handleDisconnectWalletClick = () => {
-    if (isConnectedToPeraWallet) {
-      peraWallet.disconnect()
-      setAccountAddress(null)
-      setBalance(null)
-    }
-  }
-
-  const dotCount = 15
-  const dots = React.useMemo(() => Array.from({ length: dotCount }), [])
-
-  const mouseX = useMotionValue(0)
-  const mouseY = useMotionValue(0)
-
-  const handleMouseMove = (event: React.MouseEvent) => {
-    mouseX.set(event.clientX)
-    mouseY.set(event.clientY)
-  }
-
-  React.useEffect(() => {
-    const handleWindowMouseMove = (event: MouseEvent) => {
-      mouseX.set(event.clientX)
-      mouseY.set(event.clientY)
-    }
-
-    window.addEventListener('mousemove', handleWindowMouseMove)
-    return () => {
-      window.removeEventListener('mousemove', handleWindowMouseMove)
-    }
-  }, [mouseX, mouseY])
-
   return (
-    <div className="min-h-screen bg-[#f8f1ec]" onMouseMove={handleMouseMove}>
+    <div className="min-h-screen bg-[#f8f1ec]">
       <motion.header
         style={{
           backgroundColor: headerBg,
           color: headerColor,
         }}
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-transform duration-300 mx-4 mt-4",
-          !shouldShowNav && "transform -translate-y-full"
-        )}
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       >
-        <div className="max-w-7xl mx-auto rounded-full bg-inherit backdrop-blur-sm border border-[#00524e]/10 px-6 py-4 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link href="/" className="text-2xl font-bold">
             äkta
           </Link>
@@ -173,67 +70,19 @@ export default function Home() {
               </Link>
             ))}
             
-            {isConnectedToPeraWallet ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost">
-                    <User className="w-6 h-6" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={handleDisconnectWalletClick} className="text-red-500">
-                    Disconnect
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button onClick={handleConnectWalletClick} variant="ghost">
-                <WalletIcon className="mr-2 h-4 w-4" /> Connect
-              </Button>
-            )}
+            <Button variant="ghost" className="text-sm">
+              Get a Demo
+            </Button>
+            <Button className="bg-black text-white hover:bg-black/90">
+              Sign Up
+            </Button>
           </div>
         </div>
       </motion.header>
 
       <main>
-        <section className="min-h-screen flex flex-col justify-center px-6 md:px-20 relative bg-[#f8f1ec]">
-          <div className="absolute inset-0 overflow-hidden">
-            {Array.from({ length: 40 }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-px h-px bg-[#00524e]/20"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  transform: `rotate(${Math.random() * 360}deg)`,
-                }}
-              />
-            ))}
-          </div>
-          
-          <div className="relative max-w-7xl mx-auto">
-            <div className="absolute -top-4 left-0 flex space-x-4">
-              {dots.map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="w-4 h-4 rounded-full bg-[#dedb7b]/20"
-                  style={{
-                    x: useSpring(useTransform(mouseX, [0, window.innerWidth], [-10 - i * 2, 10 + i * 2]), { stiffness: 100, damping: 30 }),
-                    y: useSpring(useTransform(mouseY, [0, window.innerHeight], [-10 - i * 2, 10 + i * 2]), { stiffness: 100, damping: 30 }),
-                  }}
-                  animate={{
-                    scale: [1, 1.1, 1],
-                    opacity: [0.5, 0.8, 0.5],
-                  }}
-                  transition={{
-                    duration: 4 + i * 0.2,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    ease: "easeInOut",
-                  }}
-                />
-              ))}
-            </div>
+        <section className="min-h-screen flex flex-col justify-center px-6 relative">
+          <div className="max-w-7xl mx-auto">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -242,7 +91,7 @@ export default function Home() {
             >
               <div className="inline-block mb-8">
                 <div className="relative">
-                  <h1 className="text-6xl md:text-8xl lg:text-8xl font-bold text-[#00524e] relative z-10">
+                  <h1 className="text-6xl md:text-8xl font-bold text-[#00524e] relative z-10">
                     All-in-one platform
                   </h1>
                   <div className="absolute -bottom-2 left-0 w-full h-6 bg-[#dedb7b] -skew-y-2" />
@@ -270,7 +119,6 @@ export default function Home() {
             </motion.div>
           </div>
         </section>
-
         <section className="py-20 overflow-hidden bg-[#00524e]/5">
           <div className="flex animate-scroll">
             {[...Array(2)].map((_, i) => (
@@ -290,58 +138,56 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="min-h-screen flex items-center px-6 md:px-20 py-32 bg-[#00524e]">
-          <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-            <div className="relative">
-              <div className="absolute inset-0 bg-[#dedb7b] rounded-full blur-3xl opacity-20" />
-              <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/%7BAA63B7AC-82D9-4A08-8F8C-4A0B6F2869BB%7D-5EzqBSw1wV6reyY4g7AoyviS3lfhOw.png"
-                alt="Feature Image"
-                width={500}
-                height={500}
-                className="relative z-10 rounded-full border-4 border-[#dedb7b]"
-              />
-            </div>
-            <div className="text-white">
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                className="text-4xl md:text-6xl lg:text-7xl font-bold mb-12"
-              >
-                Revolutionizing healthcare distribution
-              </motion.h2>
-              <p className="text-xl text-white/80 mb-8">
-                Experience seamless and secure vaccine management with our blockchain-powered platform.
-              </p>
-              <Button 
-                className="rounded-full px-8 py-6 text-lg bg-[#dedb7b] hover:bg-[#dedb7b]/90 text-[#00524e] flex items-center gap-2 group"
-              >
-                Try äkta
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-32 px-6 md:px-20 bg-[#f8f1ec]">
-          <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {navigationItems.map((item, index) => (
+        <section className="min-h-screen flex items-center px-6 bg-[#00524e] relative overflow-hidden">
+          <div className="absolute top-1/2 left-0 right-0 flex justify-between px-6">
+            {Array.from({ length: 16 }).map((_, i) => (
               <motion.div
-                key={item.href}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white/50 backdrop-blur-sm p-6 rounded-lg border border-[#00524e]/10"
-              >
-                <h3 className="text-xl font-semibold mb-2 text-[#00524e]">{item.label}</h3>
-                <p className="text-[#00524e]/80">Experience seamless and secure vaccine management with our blockchain-powered platform.</p>
-                <Link href={item.href}>
-                  <Button variant="link" className="mt-4 p-0 text-[#00524e]">Learn More →</Button>
-                </Link>
-              </motion.div>
+                key={i}
+                className="w-4 h-4 rounded-full bg-[#f8f1ec]/20"
+                animate={{
+                  y: [0, -10, 0],
+                  opacity: [0.5, 1, 0.5],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  delay: i * 0.1,
+                  ease: "easeInOut",
+                }}
+              />
             ))}
           </div>
+          <div className="max-w-7xl mx-auto w-full">
+            <div className="grid gap-20">
+              <div>
+                <motion.h2
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-4"
+                >
+                  Start quickly,<br />scale effortlessly.
+                </motion.h2>
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="text-2xl text-white/60 max-w-xl"
+                >
+                  We learn from every experience by pushing the boundaries past the ordinary. Let's simplify fintech and web3, together.
+                </motion.p>
+              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="text-5xl md:text-6xl font-bold text-white justify-self-end max-w-lg"
+              >
+                Secure your applications without any hassle.
+              </motion.div>
+            </div>
+          </div>
+          
         </section>
 
         <footer className="border-t border-[#00524e]/10 py-20 px-6 md:px-20 bg-[#f8f1ec]">
