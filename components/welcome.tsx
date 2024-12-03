@@ -110,18 +110,28 @@ export default function Component() {
                   All-in-one platform to efficiently manage and redistribute inventory between local points of sale using blockchain transparency.
                 </p>
                 <div className="flex flex-wrap gap-4">
+                  
+                  <Link href="/pricing">
                   <Button 
                     className="rounded-full px-8 py-6 text-lg bg-[#dedb7b] hover:bg-[#dedb7b]/90 text-[#00524e] flex items-center gap-2 group"
                   >
-                    Try äkta
+                    Get Started
                     <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                   </Button>
+                  </Link>
+                  
+
+                  
+
+                  <Link href="/akta">
                   <Button 
                     variant="outline"
                     className="rounded-full px-8 py-6 text-lg border-[#00524e] text-[#00524e] hover:bg-[#00524e] hover:text-white"
                   >
                     Get a demo
                   </Button>
+
+                  </Link>
                 </div>
               </div>
             </motion.div>

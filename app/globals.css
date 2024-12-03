@@ -29,6 +29,7 @@ body {
     --border: #d1c3b6;
     --input: #d1c3b6;
     --ring: #dedb7b;
+    --radius: 0.5rem;
   }
   
   .dark {
