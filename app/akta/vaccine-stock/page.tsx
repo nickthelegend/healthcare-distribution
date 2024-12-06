@@ -46,11 +46,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 const navigationItems = [
-  { href: '/', label: 'Home' },
-  { href: '/vaccine-stock', label: 'Vaccine Stock' },
-  { href: '/administer-vaccine', label: 'Administer Vaccine' },
-  { href: '/request-vaccine', label: 'Request Vaccine' },
-  { href: '/add-vaccine', label: 'Add Vaccine' },
+  { href: '/akta', label: 'Home' },
+  { href: '/akta/vaccine-stock', label: 'Vaccine Stock' },
+  { href: '/akta/administer-vaccine', label: 'Administer Vaccine' },
+  { href: '/akta/request-vaccine', label: 'Request Vaccine' },
+  { href: '/akta/add-vaccine', label: 'Add Vaccine' },
 ]
 
 const algodClient = new algosdk.Algodv2("", "https://testnet-api.algonode.cloud", "")
@@ -180,7 +180,7 @@ export default function VaccineStock() {
 
       <header className="relative z-10 flex justify-between items-center p-4 bg-gray-900 border-b border-gray-800">
         <div className="flex items-center">
-          <Link href="/" className="text-2xl font-bold">
+          <Link href="/akta" className="text-2xl font-bold">
             äkta
           </Link>
         </div>

@@ -31,9 +31,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog"
-import { WalletIcon, MenuIcon, Settings, User } from 'lucide-react'
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { WalletIcon, MenuIcon, Settings, User, PlusIcon } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { PeraWalletConnect } from "@perawallet/connect"
 import algosdk from "algosdk"
@@ -47,11 +48,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 const navigationItems = [
-  { href: '/', label: 'Home' },
-  { href: '/vaccine-stock', label: 'Vaccine Stock' },
-  { href: '/administer-vaccine', label: 'Administer Vaccine' },
-  { href: '/request-vaccine', label: 'Request Vaccine' },
-  { href: '/add-vaccine', label: 'Add Vaccine' },
+  { href: '/akta', label: 'Home' },
+  { href: '/akta/vaccine-stock', label: 'Vaccine Stock' },
+  { href: '/akta/administer-vaccine', label: 'Administer Vaccine' },
+  { href: '/akta/request-vaccine', label: 'Request Vaccine' },
+  { href: '/akta/add-vaccine', label: 'Add Vaccine' },
 ]
 
 const algodClient = new algosdk.Algodv2("", "https://testnet-api.algonode.cloud", "")
@@ -65,7 +66,7 @@ interface Vaccine {
   expirationDate: string
 }
 
-export default function AdministerVaccine() {
+export default function AddVaccine() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = React.useState(false)
   const [accountAddress, setAccountAddress] = React.useState<string | null>(null)
@@ -76,8 +77,13 @@ export default function AdministerVaccine() {
     { id: 1, name: "COVID-19 Vaccine", manufacturer: "Pfizer", quantity: 1000, expirationDate: "2023-12-31" },
     { id: 2, name: "Flu Vaccine", manufacturer: "Moderna", quantity: 500, expirationDate: "2024-06-30" },
   ])
-  const [selectedVaccine, setSelectedVaccine] = React.useState<Vaccine | null>(null)
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = React.useState(false)
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
+  const [newVaccine, setNewVaccine] = React.useState<Omit<Vaccine, 'id'>>({
+    name: '',
+    manufacturer: '',
+    quantity: 0,
+    expirationDate: '',
+  })
 
   React.useEffect(() => {
     peraWallet
@@ -133,21 +139,15 @@ export default function AdministerVaccine() {
     return text
   }
 
-  const handleUseVaccine = (vaccine: Vaccine) => {
-    setSelectedVaccine(vaccine)
-    setIsConfirmModalOpen(true)
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setNewVaccine(prev => ({ ...prev, [name]: name === 'quantity' ? parseInt(value) : value }))
   }
 
-  const confirmUseVaccine = () => {
-    if (selectedVaccine) {
-      setVaccines(vaccines.map(v => 
-        v.id === selectedVaccine.id 
-          ? { ...v, quantity: v.quantity - 1 } 
-          : v
-      ))
-      setIsConfirmModalOpen(false)
-      setSelectedVaccine(null)
-    }
+  const handleAddVaccine = () => {
+    setVaccines(prev => [...prev, { ...newVaccine, id: prev.length + 1 }])
+    setNewVaccine({ name: '', manufacturer: '', quantity: 0, expirationDate: '' })
+    setIsModalOpen(false)
   }
 
   return (
@@ -162,7 +162,7 @@ export default function AdministerVaccine() {
 
       <header className="relative z-10 flex justify-between items-center p-4 bg-gray-900 border-b border-gray-800">
         <div className="flex items-center">
-          <Link href="/" className="text-2xl font-bold">
+          <Link href="/akta" className="text-2xl font-bold">
             äkta
           </Link>
         </div>
@@ -274,64 +274,104 @@ export default function AdministerVaccine() {
 
       <main className="relative z-10 p-8">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8">Administer Vaccine</h1>
+          <h1 className="text-4xl font-bold mb-8">Add Vaccine</h1>
           
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Available Vaccines</h2>
-            <div className="rounded-md border border-gray-800">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-white">Name</TableHead>
-                    <TableHead className="text-white">Manufacturer</TableHead>
-                    <TableHead className="text-white">Quantity</TableHead>
-                    <TableHead className="text-white">Expiration Date</TableHead>
-                    <TableHead className="text-white">Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {vaccines.map((vaccine) => (
-                    <TableRow key={vaccine.id}>
-                      <TableCell className="font-medium">{vaccine.name}</TableCell>
-                      <TableCell>{vaccine.manufacturer}</TableCell>
-                      <TableCell>{vaccine.quantity}</TableCell>
-                      <TableCell>{vaccine.expirationDate}</TableCell>
-                      <TableCell>
-                        <Button 
-                          onClick={() => handleUseVaccine(vaccine)}
-                          disabled={vaccine.quantity === 0}
-                        >
-                          Use
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+          <div className="mb-6 flex justify-between items-center">
+            <h2 className="text-2xl font-semibold">Current Inventory</h2>
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <PlusIcon className="mr-2 h-4 w-4" /> Add Vaccine
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] bg-gray-900 text-white">
+                <DialogHeader>
+                  <DialogTitle>Add New Vaccine</DialogTitle>
+                  <DialogDescription>
+                    Enter the details of the new vaccine to add to the inventory.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={newVaccine.name}
+                      onChange={handleInputChange}
+                      className="col-span-3 bg-gray-800 text-white"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="manufacturer" className="text-right">
+                      Manufacturer
+                    </Label>
+                    <Input
+                      id="manufacturer"
+                      name="manufacturer"
+                      value={newVaccine.manufacturer}
+                      onChange={handleInputChange}
+                      className="col-span-3 bg-gray-800 text-white"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="quantity" className="text-right">
+                      Quantity
+                    </Label>
+                    <Input
+                      id="quantity"
+                      name="quantity"
+                      type="number"
+                      value={newVaccine.quantity}
+                      onChange={handleInputChange}
+                      className="col-span-3 bg-gray-800 text-white"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="expirationDate" className="text-right">
+                      Expiration Date
+                    </Label>
+                    <Input
+                      id="expirationDate"
+                      name="expirationDate"
+                      type="date"
+                      value={newVaccine.expirationDate}
+                      onChange={handleInputChange}
+                      className="col-span-3 bg-gray-800 text-white"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <Button onClick={handleAddVaccine}>Add Vaccine</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
           
-          <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
-            <DialogContent className="sm:max-w-[425px] bg-gray-900 text-white">
-              <DialogHeader>
-                <DialogTitle>Confirm Vaccine Administration</DialogTitle>
-                <DialogDescription>
-                  Are you sure you want to administer this vaccine?
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4">
-                {selectedVaccine && (
-                  <p>
-                    You are about to use 1 dose of {selectedVaccine.name} manufactured by {selectedVaccine.manufacturer}.
-                  </p>
-                )}
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsConfirmModalOpen(false)}>Cancel</Button>
-                <Button onClick={confirmUseVaccine}>Confirm</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <div className="rounded-md border border-gray-800">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-white">Name</TableHead>
+                  <TableHead className="text-white">Manufacturer</TableHead>
+                  <TableHead className="text-white">Quantity</TableHead>
+                  <TableHead className="text-white">Expiration Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {vaccines.map((vaccine) => (
+                  <TableRow key={vaccine.id}>
+                    <TableCell className="font-medium">{vaccine.name}</TableCell>
+                    <TableCell>{vaccine.manufacturer}</TableCell>
+                    <TableCell>{vaccine.quantity}</TableCell>
+                    <TableCell>{vaccine.expirationDate}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </main>
 
