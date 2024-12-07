@@ -19,47 +19,55 @@ const navigationItems = [
 const pricingPlans = [
   {
     name: "Basic",
-    price: 25,
+    price: 15,
+    description: "Best for small businesses or startups.",
     features: [
-      { name: "Landingpage Asset", quantity: 1 },
-      { name: "Illustration Asset", quantity: 10 },
-      { name: "Template Animation", quantity: 10 },
-      { name: "Icon Asset", quantity: 15 },
-      { name: "Photos Asset", quantity: 10 },
+      { name: "Inventory Redistribution Transactions", quantity: 10 },
+      { name: "Management for Unique Items", quantity: 50 },
+      { name: "Access to Basic Data Analytics Dashboard (View-only Insights)", quantity: 1 },
+      { name: "API Calls/Month", quantity: 25 },
+      { name: "Access Tokens", quantity: 5 },
+      { name: "Email Support", quantity: 1 },
     ],
   },
   {
     name: "Standard",
-    price: 50,
+    price: 30,
+    description: "Suitable for growing businesses with moderate inventory needs.",
     features: [
-      { name: "Landingpage Asset", quantity: 3 },
-      { name: "Illustration Asset", quantity: 20 },
-      { name: "Template Animation", quantity: 20 },
-      { name: "Icon Asset", quantity: 30 },
-      { name: "Photos Asset", quantity: 20 },
+      { name: "Inventory Redistribution Transactions", quantity: 50 },
+      { name: "Management for Unique Items", quantity: 150 },
+      { name: "Access to Standard Data Analytics Dashboard (Customizable Insights & Reports)", quantity: 1 },
+      { name: "API Calls/Month", quantity: 100 },
+      { name: "Access Tokens", quantity: 15 },
+      { name: "Priority Email Support", quantity: 1 },
     ],
   },
   {
     name: "Premium",
-    price: 75,
+    price: 50,
     isPopular: true,
+    description: "Designed for businesses requiring comprehensive inventory solutions.",
     features: [
-      { name: "Landingpage Asset", quantity: 5 },
-      { name: "Illustration Asset", quantity: 30 },
-      { name: "Template Animation", quantity: 30 },
-      { name: "Icon Asset", quantity: 45 },
-      { name: "Photos Asset", quantity: 30 },
+      { name: "Inventory Redistribution Transactions", quantity: 200 },
+      { name: "Management for Unique Items", quantity: 500 },
+      { name: "Access to Advanced Data Analytics Dashboard (Real-Time Insights, Predictive Analytics)", quantity: 1 },
+      { name: "API Calls/Month", quantity: 500 },
+      { name: "Access Tokens", quantity: 50 },
+      { name: "24/7 Support", quantity: 1 },
     ],
   },
   {
     name: "Deluxe",
-    price: 100,
+    price: 75,
+    description: "Tailored for enterprises with large-scale operations.",
     features: [
-      { name: "Landingpage Asset", quantity: 10 },
-      { name: "Illustration Asset", quantity: 50 },
-      { name: "Template Animation", quantity: 50 },
-      { name: "Icon Asset", quantity: 100 },
-      { name: "Photos Asset", quantity: 50 },
+      { name: "Inventory Redistribution Transactions", quantity: "Unlimited" },
+      { name: "Management for Unique Items", quantity: "Unlimited" },
+      { name: "Full Access to Pro-Level Data Analytics Dashboard (AI-Powered Insights, Custom Forecasting)", quantity: 1 },
+      { name: "API Calls", quantity: "Unlimited" },
+      { name: "Access Tokens", quantity: "Unlimited" },
+      { name: "Dedicated Account Manager & 24/7 Priority Support", quantity: 1 },
     ],
   },
 ]
@@ -148,7 +156,7 @@ export default function PricingPage() {
               >
                 {plan.isPopular && (
                   <div className="absolute -top-4 right-4 bg-[#dedb7b] text-[#00524e] px-3 py-1 rounded-full text-sm font-medium">
-                    Live
+                    Most Popular
                   </div>
                 )}
                 <CardHeader>
@@ -159,6 +167,7 @@ export default function PricingPage() {
                       /{isYearly ? 'year' : 'month'}
                     </span>
                   </div>
+                  <p className="text-sm mt-2 opacity-80">{plan.description}</p>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-4">
@@ -181,7 +190,7 @@ export default function PricingPage() {
                         : "bg-[#00524e] text-white hover:bg-[#00524e]/90"
                     )}
                   >
-                    Buy Package
+                    Choose Plan
                   </Button>
                 </CardFooter>
               </Card>
@@ -192,3 +201,4 @@ export default function PricingPage() {
     </div>
   )
 }
+
